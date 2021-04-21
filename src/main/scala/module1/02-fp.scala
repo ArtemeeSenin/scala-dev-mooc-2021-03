@@ -132,7 +132,7 @@ object hof{
  */
 
 
- object opt {
+ object opt extends App {
 
   /**
    *
@@ -178,6 +178,7 @@ object hof{
      */
     def printIfAny(): Unit = this match {
       case Option.Some(v) => println(v)
+      case _ => ()
     }
 
     def flatMap[B](f: A => Option[B]): Option[B] = this match {
@@ -192,23 +193,22 @@ object hof{
      * Реализовать метод filter, который будет возвращать не пустой Option
      * в случае если исходный не пуст и предикат от значения = true
      */
-    def filter(predicate: A => Boolean): Option[A] = {
-      if (this.isEmpty) Option.None
-      else predicate match {
-        case true => Option.Some(this.get)
-        case false => Option.None
-      }
+    def filter(predicate: A => Boolean): Option[A] = this match {
+      case Option.Some(v) if predicate(v) => Option.Some(v)
+      case _ => Option.None
     }
 
     /**
      *
      * Реализовать метод zip, который будет создавать Option от пары значений из 2-х Option
      */
-    def zip[T, U](a: Option[T], b: Option[U]): Option[(Option[T], Option[U])] = {
-      if (a.isEmpty && b.isEmpty) Option.None
-      else Option.Some((a, b))
+    def zip[B](b: Option[B]): Option[(A, B)] = this match {
+      case Option.Some(x) => b match {
+        case Option.Some(y) => Option.Some(x, y)
+        case _ => Option.None
+      }
+      case _ => Option.None
     }
-
   }
 
    object Option{
@@ -219,4 +219,17 @@ object hof{
   def f(x: Int, y: Int): Option[Int] =
     if (y == 0) Option.None
     else Option.Some(x / y)
+
+
+  val a = Option.Some("aaa")
+  val b = Option.Some("bbb")
+  val x = Option.None
+  val z = Option.None
+
+  a.map(s => s + "!!!").printIfAny()
+  a.zip(b).printIfAny()
+  println(a.zip(b))
+  println(a.zip(x))
+  println(z.zip(x))
+  z.zip(x).printIfAny()
 }
